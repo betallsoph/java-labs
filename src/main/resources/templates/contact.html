@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact</title>
+  <link rel="stylesheet" href="/css/neo.css"/>
+</head>
+<body>
+<div class="container">
+  <div class="hdr">
+    <div class="badge">Neo‑Brutalism</div>
+    <h1 class="h1">Contact Us</h1>
+  </div>
+  <a class="btn" href="/">← Home</a>
+  <div class="card">
+    <form method="post" action="/contact">
+      <label for="name">Name</label>
+      <input id="name" name="name" required/>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required/>
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="4"></textarea>
+      <div style="margin-top:12px">
+        <button class="btn" type="submit">Send</button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Result</title>
+  <link rel="stylesheet" href="/css/neo.css"/>
+</head>
+<body>
+<div class="container">
+  <div class="hdr">
+    <div class="badge">Neo‑Brutalism</div>
+    <h1 class="h1">Thanks!</h1>
+  </div>
+  <a class="btn" href="/">← Home</a>
+  <div class="card">
+    <p><strong>Name:</strong> <span th:text="${name}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${email}"></span></p>
+    <p><strong>Message:</strong></p>
+    <p th:text="${message}"></p>
+  </div>
+</div>
+</body>
+</html>
