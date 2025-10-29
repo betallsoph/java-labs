@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot MongoDB API - Home</title>
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #ffffff;
+            --accent: #ff0000;
+            --warning: #ffff00;
+            --success: #00ff00;
+            --error: #ff0000;
+            --shadow: 4px 4px 0px;
+            --border: 3px solid;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--secondary);
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Neo-brutalism header */
+        .header {
+            background-color: var(--accent);
+            border-bottom: var(--border) var(--primary);
+            padding: 20px 0;
+            box-shadow: 0 var(--shadow) var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+        }
+
+        .nav-link:hover {
+            background-color: var(--warning);
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            background-color: var(--warning);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0px var(--secondary);
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        /* Features grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.1s ease;
+        }
+
+        .feature:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .feature p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 12px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+            text-decoration: none;
+            display: inline-block;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        /* API endpoints section */
+        .api-section {
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 40px;
+            border: var(--border) var(--secondary);
+            box-shadow: var(--shadow) var(--secondary);
+            margin-bottom: 40px;
+        }
+
+        .api-section h2 {
+            text-transform: uppercase;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .endpoint {
+            background-color: var(--secondary);
+            color: var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid var(--secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 10px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .method.get { background-color: var(--success); }
+        .method.post { background-color: var(--warning); color: var(--primary); }
+        .method.put { background-color: #0066ff; }
+        .method.patch { background-color: #ff6600; }
+        .method.delete { background-color: var(--error); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+                letter-spacing: 2px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">BRUTAL API</div>
+                <ul class="nav-links">
+                    <li><a href="/" class="nav-link active">HOME</a></li>
+                    <li><a href="/products" class="nav-link">PRODUCTS</a></li>
+                    <li><a href="/orders" class="nav-link">ORDERS</a></li>
+                    <li><a href="/login" class="nav-link" id="login-link">LOGIN</a></li>
+                    <li><a href="/register" class="nav-link" id="register-link">REGISTER</a></li>
+                    <li><a href="#" class="nav-link hidden" id="logout-link">LOGOUT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>BRUTAL API</h1>
+            <p>A MODERN SPRING BOOT MONGODB REST API WITH NEO-BRUTALISM DESIGN</p>
+            <a href="/products" class="btn btn-primary">EXPLORE PRODUCTS</a>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <span class="feature-icon">🔐</span>
+                <h3>JWT Authentication</h3>
+                <p>Secure user authentication and authorization using JSON Web Tokens with bcrypt password hashing.</p>
+                <a href="/register" class="btn btn-success">GET STARTED</a>
+            </div>
+            
+            <div class="feature">
+                <span class="feature-icon">📦</span>
+                <h3>Product Management</h3>
+                <p>Full CRUD operations for products with code, name, price, illustration, and description.</p>
+                <a href="/products" class="btn btn-warning">VIEW PRODUCTS</a>
+            </div>
+            
+            <div class="feature">
+                <span class="feature-icon">🛒</span>
+                <h3>Order System</h3>
+                <p>Complete order management system with product lists, pricing, and user associations.</p>
+                <a href="/orders" class="btn btn-success">VIEW ORDERS</a>
+            </div>
+        </section>
+
+        <section class="api-section">
+            <h2>API ENDPOINTS</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/account/register</strong> - Register new user account
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/account/login</strong> - User authentication
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/products</strong> - Get all products
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/products</strong> - Create new product (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/products/{id}</strong> - Get product by ID
+            </div>
+            
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <strong>/api/products/{id}</strong> - Update product (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method patch">PATCH</span>
+                <strong>/api/products/{id}</strong> - Partial update product (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <strong>/api/products/{id}</strong> - Delete product (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/orders</strong> - Get all orders
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/orders</strong> - Create new order (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/orders/{id}</strong> - Get order by ID
+            </div>
+            
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <strong>/api/orders/{id}</strong> - Update order (AUTH REQUIRED)
+            </div>
+            
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <strong>/api/orders/{id}</strong> - Delete order (AUTH REQUIRED)
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Global API base URL
+        const API_BASE = '/api';
+        
+        // Check if user is logged in
+        function isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        // Get auth token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Remove auth token
+        function removeToken() {
+            localStorage.removeItem('token');
+            updateNavigation();
+        }
+
+        // Update navigation based on auth state
+        function updateNavigation() {
+            const loginLink = document.getElementById('login-link');
+            const registerLink = document.getElementById('register-link');
+            const logoutLink = document.getElementById('logout-link');
+
+            if (isLoggedIn()) {
+                loginLink.classList.add('hidden');
+                registerLink.classList.add('hidden');
+                logoutLink.classList.remove('hidden');
+            } else {
+                loginLink.classList.remove('hidden');
+                registerLink.classList.remove('hidden');
+                logoutLink.classList.add('hidden');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            removeToken();
+            window.location.href = '/';
+        }
+
+        // Initialize navigation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            
+            // Add logout event listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Brutal API</title>
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #ffffff;
+            --accent: #ff0000;
+            --warning: #ffff00;
+            --success: #00ff00;
+            --error: #ff0000;
+            --shadow: 4px 4px 0px;
+            --border: 3px solid;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--secondary);
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Neo-brutalism header */
+        .header {
+            background-color: var(--accent);
+            border-bottom: var(--border) var(--primary);
+            padding: 20px 0;
+            box-shadow: 0 var(--shadow) var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+        }
+
+        .nav-link:hover {
+            background-color: var(--warning);
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        /* Page header */
+        .page-header {
+            background-color: var(--success);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 12px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+            text-decoration: none;
+            display: inline-block;
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+            color: var(--secondary);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Orders grid */
+        .orders-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .order-card {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            padding: 20px;
+            transition: all 0.1s ease;
+        }
+
+        .order-card:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-number {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .order-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .order-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .order-products {
+            margin-bottom: 15px;
+        }
+
+        .order-products h4 {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-name {
+            font-weight: bold;
+        }
+
+        .product-details {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .order-actions .btn {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            margin: 2% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 15px;
+            margin: -30px -30px 20px -30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: var(--border) var(--primary);
+            background-color: var(--secondary);
+            font-family: inherit;
+            font-size: 14px;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.2), 0 0 0 3px var(--warning);
+        }
+
+        .product-selector {
+            border: var(--border) var(--primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .remove-product {
+            background-color: var(--error);
+            color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Loading and empty states */
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--warning);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background-color: var(--success);
+        }
+
+        .alert-error {
+            background-color: var(--error);
+            color: var(--secondary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .product-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+                padding: 20px;
+            }
+
+            .modal-header {
+                margin: -20px -20px 15px -20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">BRUTAL API</div>
+                <ul class="nav-links">
+                    <li><a href="/" class="nav-link">HOME</a></li>
+                    <li><a href="/products" class="nav-link">PRODUCTS</a></li>
+                    <li><a href="/orders" class="nav-link active">ORDERS</a></li>
+                    <li><a href="/login" class="nav-link" id="login-link">LOGIN</a></li>
+                    <li><a href="/register" class="nav-link" id="register-link">REGISTER</a></li>
+                    <li><a href="#" class="nav-link hidden" id="logout-link">LOGOUT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <h1 class="page-title">ORDERS</h1>
+        </div>
+
+        <div class="controls">
+            <div>
+                <button class="btn btn-success" id="addOrderBtn">+ CREATE ORDER</button>
+            </div>
+            <div>
+                <button class="btn btn-warning" id="refreshBtn">🔄 REFRESH</button>
+            </div>
+        </div>
+
+        <div id="loadingContainer" class="loading-container">
+            <div class="loading"></div>
+            <div>LOADING ORDERS...</div>
+        </div>
+
+        <div id="ordersContainer" class="orders-grid hidden"></div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <h3>NO ORDERS FOUND</h3>
+            <p>Start by creating your first order!</p>
+            <br>
+            <button class="btn btn-success" onclick="openAddModal()">CREATE ORDER</button>
+        </div>
+    </main>
+
+    <!-- Add/Edit Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modalTitle">CREATE ORDER</span>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="orderNumber" class="form-label">Order Number (auto-generated if empty)</label>
+                    <input type="text" id="orderNumber" name="orderNumber" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Products</label>
+                    <div id="productsContainer">
+                        <!-- Products will be added here -->
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="addProductRow()">+ ADD PRODUCT</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="totalPrice" class="form-label">Total Price ($)</label>
+                    <input type="number" id="totalPrice" name="totalPrice" class="form-input" step="0.01" min="0" readonly>
+                </div>
+                
+                <button type="submit" class="btn btn-success" id="saveBtn">SAVE ORDER</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentEditId = null;
+        let availableProducts = [];
+
+        // Check if user is logged in
+        function isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        // Get auth token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Remove auth token
+        function removeToken() {
+            localStorage.removeItem('token');
+            updateNavigation();
+        }
+
+        // Update navigation based on auth state
+        function updateNavigation() {
+            const loginLink = document.getElementById('login-link');
+            const registerLink = document.getElementById('register-link');
+            const logoutLink = document.getElementById('logout-link');
+            const addBtn = document.getElementById('addOrderBtn');
+
+            if (isLoggedIn()) {
+                loginLink.classList.add('hidden');
+                registerLink.classList.add('hidden');
+                logoutLink.classList.remove('hidden');
+                addBtn.style.display = 'inline-block';
+            } else {
+                loginLink.classList.remove('hidden');
+                registerLink.classList.remove('hidden');
+                logoutLink.classList.add('hidden');
+                addBtn.style.display = 'none';
+            }
+        }
+
+        // API request helper
+        async function apiRequest(url, options = {}) {
+            const token = getToken();
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
+            const response = await fetch(API_BASE + url, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                removeToken();
+                showAlert('Session expired. Please login again.');
+                return null;
+            }
+
+            return response;
+        }
+
+        // Load orders
+        async function loadOrders() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const ordersContainer = document.getElementById('ordersContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            loadingContainer.classList.remove('hidden');
+            ordersContainer.classList.add('hidden');
+            emptyState.classList.add('hidden');
+
+            try {
+                const response = await apiRequest('/orders');
+                if (!response) return;
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    displayOrders(data.data);
+                } else {
+                    showAlert(data.message || 'Failed to load orders');
+                }
+            } catch (error) {
+                showAlert('Network error. Please try again.');
+            } finally {
+                loadingContainer.classList.add('hidden');
+            }
+        }
+
+        // Load products for dropdown
+        async function loadProducts() {
+            try {
+                const response = await apiRequest('/products');
+                if (!response) return;
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    availableProducts = data.data;
+                } else {
+                    availableProducts = [];
+                }
+            } catch (error) {
+                availableProducts = [];
+            }
+        }
+
+        // Display orders
+        function displayOrders(orders) {
+            const ordersContainer = document.getElementById('ordersContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (orders.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            ordersContainer.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-number">${order.orderNumber}</div>
+                        <div class="order-total">$${parseFloat(order.totalPrice).toFixed(2)}</div>
+                    </div>
+                    <div class="order-date">Created: ${new Date(order.createdAt).toLocaleDateString()}</div>
+                    <div class="order-products">
+                        <h4>Products (${order.products.length})</h4>
+                        ${order.products.map(item => `
+                            <div class="product-item">
+                                <div>
+                                    <div class="product-name">${item.product ? item.product.name : 'Unknown Product'}</div>
+                                    <div class="product-details">Qty: ${item.quantity} × $${parseFloat(item.unitPrice).toFixed(2)}</div>
+                                </div>
+                                <div>$${parseFloat(item.totalPrice).toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="order-actions">
+                        ${isLoggedIn() ? `
+                            <button class="btn btn-warning" onclick="editOrder('${order.id}')">EDIT</button>
+                            <button class="btn btn-danger" onclick="deleteOrder('${order.id}')">DELETE</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            ordersContainer.classList.remove('hidden');
+        }
+
+        // Open add modal
+        async function openAddModal() {
+            if (!isLoggedIn()) {
+                showAlert('Please login to create orders');
+                return;
+            }
+            
+            await loadProducts();
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = 'CREATE ORDER';
+            document.getElementById('orderForm').reset();
+            document.getElementById('productsContainer').innerHTML = '';
+            addProductRow();
+            document.getElementById('orderModal').style.display = 'block';
+        }
+
+        // Add product row
+        function addProductRow(productData = null) {
+            const container = document.getElementById('productsContainer');
+            const rowId = 'product-' + Date.now();
+            
+            const productOptions = availableProducts.map(p => 
+                `<option value="${p.id}" data-price="${p.price}" ${productData && productData.product && productData.product.id === p.id ? 'selected' : ''}>${p.name} - $${parseFloat(p.price).toFixed(2)}</option>`
+            ).join('');
+
+            const row = document.createElement('div');
+            row.className = 'product-selector';
+            row.id = rowId;
+            row.innerHTML = `
+                <div class="product-row">
+                    <select class="form-select product-select" onchange="updateRowPrice('${rowId}')">
+                        <option value="">Select Product</option>
+                        ${productOptions}
+                    </select>
+                    <input type="number" class="form-input quantity-input" placeholder="Quantity" min="1" value="${productData ? productData.quantity : 1}" onchange="updateRowPrice('${rowId}')">
+                    <input type="number" class="form-input total-input" placeholder="Total" step="0.01" readonly>
+                    <button type="button" class="remove-product" onclick="removeProductRow('${rowId}')">×</button>
+                </div>
+            `;
+
+            container.appendChild(row);
+            
+            if (productData) {
+                updateRowPrice(rowId);
+            }
+            
+            updateTotalPrice();
+        }
+
+        // Remove product row
+        function removeProductRow(rowId) {
+            document.getElementById(rowId).remove();
+            updateTotalPrice();
+        }
+
+        // Update row price
+        function updateRowPrice(rowId) {
+            const row = document.getElementById(rowId);
+            const select = row.querySelector('.product-select');
+            const quantityInput = row.querySelector('.quantity-input');
+            const totalInput = row.querySelector('.total-input');
+
+            const selectedOption = select.options[select.selectedIndex];
+            const price = selectedOption ? parseFloat(selectedOption.dataset.price) : 0;
+            const quantity = parseInt(quantityInput.value) || 0;
+            const total = price * quantity;
+
+            totalInput.value = total.toFixed(2);
+            updateTotalPrice();
+        }
+
+        // Update total price
+        function updateTotalPrice() {
+            const totalInputs = document.querySelectorAll('.total-input');
+            let total = 0;
+            
+            totalInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            
+            document.getElementById('totalPrice').value = total.toFixed(2);
+        }
+
+        // Edit order
+        async function editOrder(id) {
+            if (!isLoggedIn()) {
+                showAlert('Please login to edit orders');
+                return;
+            }
+
+            try {
+                const response = await apiRequest(`/orders/${id}`);
+                if (!response) return;
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    await loadProducts();
+                    const order = data.data;
+                    currentEditId = id;
+                    document.getElementById('modalTitle').textContent = 'EDIT ORDER';
+                    document.getElementById('orderNumber').value = order.orderNumber;
+                    document.getElementById('totalPrice').value = parseFloat(order.totalPrice).toFixed(2);
+                    
+                    // Clear and populate products
+                    document.getElementById('productsContainer').innerHTML = '';
+                    order.products.forEach(item => {
+                        addProductRow(item);
+                    });
+                    
+                    document.getElementById('orderModal').style.display = 'block';
+                } else {
+                    showAlert(data.message || 'Failed to load order');
+                }
+            } catch (error) {
+                showAlert('Network error. Please try again.');
+            }
+        }
+
+        // Delete order
+        async function deleteOrder(id) {
+            if (!isLoggedIn()) {
+                showAlert('Please login to delete orders');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this order?')) {
+                return;
+            }
+
+            try {
+                const response = await apiRequest(`/orders/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response) return;
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showAlert('Order deleted successfully!', 'success');
+                    loadOrders();
+                } else {
+                    showAlert(data.message || 'Failed to delete order');
+                }
+            } catch (error) {
+                showAlert('Network error. Please try again.');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('orderModal').style.display = 'none';
+        }
+
+        // Show alert
+        function showAlert(message, type = 'error') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Logout function
+        function logout() {
+            removeToken();
+            window.location.href = '/';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            loadOrders();
+
+            // Add order button
+            document.getElementById('addOrderBtn').addEventListener('click', openAddModal);
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', loadOrders);
+
+            // Logout link
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+
+            // Order form submission
+            document.getElementById('orderForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const saveBtn = document.getElementById('saveBtn');
+                const originalText = saveBtn.innerHTML;
+                
+                saveBtn.innerHTML = '<span class="loading"></span> SAVING...';
+                saveBtn.disabled = true;
+
+                // Collect product data
+                const productRows = document.querySelectorAll('.product-selector');
+                const products = [];
+                
+                for (const row of productRows) {
+                    const select = row.querySelector('.product-select');
+                    const quantityInput = row.querySelector('.quantity-input');
+                    const totalInput = row.querySelector('.total-input');
+                    
+                    if (select.value && quantityInput.value) {
+                        const selectedOption = select.options[select.selectedIndex];
+                        const unitPrice = parseFloat(selectedOption.dataset.price);
+                        const quantity = parseInt(quantityInput.value);
+                        const totalPrice = parseFloat(totalInput.value);
+                        
+                        products.push({
+                            product: { id: select.value },
+                            quantity: quantity,
+                            unitPrice: unitPrice,
+                            totalPrice: totalPrice
+                        });
+                    }
+                }
+
+                if (products.length === 0) {
+                    showAlert('Please add at least one product to the order');
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                    return;
+                }
+
+                const formData = {
+                    orderNumber: document.getElementById('orderNumber').value || null,
+                    totalPrice: parseFloat(document.getElementById('totalPrice').value),
+                    products: products
+                };
+
+                try {
+                    const url = currentEditId ? `/orders/${currentEditId}` : '/orders';
+                    const method = currentEditId ? 'PUT' : 'POST';
+
+                    const response = await apiRequest(url, {
+                        method: method,
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (!response) return;
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        showAlert(currentEditId ? 'Order updated successfully!' : 'Order created successfully!', 'success');
+                        closeModal();
+                        loadOrders();
+                    } else {
+                        showAlert(data.message || 'Failed to save order');
+                    }
+                } catch (error) {
+                    showAlert('Network error. Please try again.');
+                } finally {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('orderModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

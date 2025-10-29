@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} ?: 'Spring Boot MongoDB API'">Spring Boot MongoDB API</title>
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #ffffff;
+            --accent: #ff0000;
+            --warning: #ffff00;
+            --success: #00ff00;
+            --error: #ff0000;
+            --shadow: 4px 4px 0px;
+            --border: 3px solid;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--secondary);
+            color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Neo-brutalism header */
+        .header {
+            background-color: var(--accent);
+            border-bottom: var(--border) var(--primary);
+            padding: 20px 0;
+            box-shadow: 0 var(--shadow) var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+        }
+
+        .nav-link:hover {
+            background-color: var(--warning);
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            padding: 12px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: var(--shadow) var(--primary);
+            text-decoration: none;
+            display: inline-block;
+            color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--primary);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+            color: var(--secondary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: var(--border) var(--primary);
+            background-color: var(--secondary);
+            font-family: inherit;
+            font-size: 16px;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+        }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 0px rgba(0,0,0,0.2), 0 0 0 3px var(--warning);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--secondary);
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 15px;
+            margin: -20px -20px 20px -20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: var(--border) var(--primary);
+            background-color: var(--secondary);
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-right: var(--border) var(--primary);
+            border-bottom: var(--border) var(--primary);
+        }
+
+        .table th {
+            background-color: var(--primary);
+            color: var(--secondary);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table td:last-child,
+        .table th:last-child {
+            border-right: none;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: var(--border) var(--primary);
+            box-shadow: var(--shadow) var(--primary);
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background-color: var(--success);
+        }
+
+        .alert-error {
+            background-color: var(--error);
+            color: var(--secondary);
+        }
+
+        .alert-warning {
+            background-color: var(--warning);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">BRUTAL API</div>
+                <ul class="nav-links">
+                    <li><a href="/" class="nav-link">HOME</a></li>
+                    <li><a href="/products" class="nav-link">PRODUCTS</a></li>
+                    <li><a href="/orders" class="nav-link">ORDERS</a></li>
+                    <li><a href="/login" class="nav-link" id="login-link">LOGIN</a></li>
+                    <li><a href="/register" class="nav-link" id="register-link">REGISTER</a></li>
+                    <li><a href="#" class="nav-link hidden" id="logout-link">LOGOUT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div th:replace="${content}"></div>
+    </main>
+
+    <script>
+        // Global API base URL
+        const API_BASE = '/api';
+        
+        // Check if user is logged in
+        function isLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        // Get auth token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Set auth token
+        function setToken(token) {
+            localStorage.setItem('token', token);
+            updateNavigation();
+        }
+
+        // Remove auth token
+        function removeToken() {
+            localStorage.removeItem('token');
+            updateNavigation();
+        }
+
+        // Update navigation based on auth state
+        function updateNavigation() {
+            const loginLink = document.getElementById('login-link');
+            const registerLink = document.getElementById('register-link');
+            const logoutLink = document.getElementById('logout-link');
+
+            if (isLoggedIn()) {
+                loginLink.classList.add('hidden');
+                registerLink.classList.add('hidden');
+                logoutLink.classList.remove('hidden');
+            } else {
+                loginLink.classList.remove('hidden');
+                registerLink.classList.remove('hidden');
+                logoutLink.classList.add('hidden');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            removeToken();
+            window.location.href = '/';
+        }
+
+        // API request helper
+        async function apiRequest(url, options = {}) {
+            const token = getToken();
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
+            const response = await fetch(API_BASE + url, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                removeToken();
+                window.location.href = '/login';
+                return;
+            }
+
+            return response;
+        }
+
+        // Show loading state
+        function showLoading(element) {
+            element.innerHTML = '<span class="loading"></span> LOADING...';
+            element.disabled = true;
+        }
+
+        // Hide loading state
+        function hideLoading(element, originalText) {
+            element.innerHTML = originalText;
+            element.disabled = false;
+        }
+
+        // Show alert
+        function showAlert(message, type = 'error') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Initialize navigation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            
+            // Add logout event listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        });
+    </script>
+</body>
+</html>
