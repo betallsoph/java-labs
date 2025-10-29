@@ -1,0 +1,23 @@
+‘Ton Due Thang University
+Faculty of Information Technology
+EXERCISE 2
+Using the given html template files to create a website to manage employes. The website should
+have the employee management functions organized into the following urls:
+employees:
+'* GET request: List all employees in a html table
+'* POST request: not available
+Jemployees/adé:
+'* GET request: show an html form to add a new employee
+'* POST request: receive the employee information sent from the GET request, save the new
+‘employee and redirect to /employees to show the result.
+Jemployees/edit/{id}
+'* GET request: show an html form to edit the employee information.
+‘+ POST request: receive the employee information sent from the GET request, update the
+‘employee from data storage then redirect to /employees to show the result
+Jemployees/delete/{id}:
+* GET request: not available
+'* POST request: perform delete employee based on the given id then redirect to /employees
+to show the result.
+Use in conjunction with Spring Data JPA learned in previous lessons to read/write real data from a
+database server.
+Java Technology - Week 08 ~Page 3

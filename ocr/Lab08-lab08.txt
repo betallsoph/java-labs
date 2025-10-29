@@ -1,0 +1,35 @@
+‘Ton Duc Thang University
+Faculty of Information Technology
+JAVA TECHNOLOGY
+(503111)
+aps
+
+EXERCISE 1
+‘An exercise on how to set up a basic mvc web project using Spring Boot and the Thymeleat view
+template.
+Use the Spring Initialize tool provided online at httos://start.spring.io/ to create a spring project
+‘according to the requirements below:
+
+‘+ Project type: maven
+
+‘+ Language: java
+
+‘+ Project Metadata: set up to you
+
+‘* Packaging: Jar
+
+‘+ Java version: choose according to the JDK version on your computer
+
+‘+ Add the following dependencies: Lombok, Spring Web, Thymeleat.
+
+'* Download the project asa zip, extract it, and open it wth one ofthe supported programming
+‘tools: Intell ea, Visual Studio Code, Spring Too! Suite, etc.
+
+Create a web controller named HiomeController and set the request mappings as follows:
+
+‘+ /:This path only accepts requests sent by the GET method. When accessing this url, the web
+server needs to return the content from the index.html file, which is equivalent to the
+homepage. Your index.htm! file can contain any html content, however it must contain a
+hyperlink that links to the /contact path
+
+Java Technology - Week 08 Page 1

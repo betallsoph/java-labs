@@ -3,31 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo CRUD Sách (Spring Boot WAR)</title>
+  <title>Demo CRUD Sách</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 40px; }
-    h1 { margin-top: 0; }
-    form, .list { max-width: 720px; }
-    input { padding: 8px 10px; margin-right: 8px; }
-    button { padding: 8px 12px; cursor: pointer; }
-    table { border-collapse: collapse; width: 100%; margin-top: 16px; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background: #f3f4f6; text-align: left; }
+    :root {
+      --bg: #f6f7f9;
+      --ink: #111827;
+      --primary: #93c5fd; /* light sky blue */
+      --primary-ink: #0f172a;
+      --accent: #ffd803; /* yellow punch */
+      --accent-ink: #111827;
+      --card: #ffffff;
+      --danger: #ff6b6b;
+      --ok: #89e219;
+      --shadow: 6px 6px 0 #111827; /* hard shadow */
+      --radius: 10px;
+      --border: 3px solid #111827;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 40px; color: var(--ink); background: var(--bg);
+      background-image: linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px),
+                        linear-gradient(0deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .title {
+      display: inline-block; padding: 10px 16px; background: var(--accent);
+      border: var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+      margin: 0 0 20px 0;
+    }
+    .panel {
+      background: var(--card); border: var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px; margin-bottom: 20px;
+    }
+    .row { display: flex; gap: 14px; flex-wrap: wrap; }
+    input {
+      padding: 12px 14px; border: var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); outline: none; background: #fff; min-width: 240px;
+    }
+    .btn, button {
+      padding: 12px 16px; border: var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); cursor: pointer; background: var(--primary); color: var(--primary-ink);
+      transition: transform 0.05s ease;
+    }
+    .btn { text-decoration: none; display: inline-block; }
+    .btn, button { margin: 4px 6px 6px 0; }
+    .btn:active, button:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0 #111827; }
+    .btn-accent { background: var(--accent); color: var(--accent-ink); }
+    .btn-danger { background: var(--danger); }
     .muted { color: #6b7280; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    thead th {
+      background: #e5e7eb; text-align: left; padding: 12px; border-top: var(--border);
+      border-bottom: var(--border); border-left: var(--border);
+    }
+    thead th:last-child { border-right: var(--border); }
+    tbody td { padding: 12px; border-left: var(--border); border-bottom: var(--border); background: #fff; }
+    tbody tr td:last-child { border-right: var(--border); }
   </style>
 </head>
 <body>
-  <h1>Demo CRUD Sách</h1>
-  <p class="muted">API: <code>/api/books</code> — DB: H2 (in‑memory)</p>
+  <div class="wrap">
+    <h1 class="title">Demo CRUD Sách</h1>
+    <p class="muted">API: <code>/api/books</code> — DB: MongoDB local — <a href="/contact">Liên hệ</a></p>
+    <div class="panel" style="margin-top:16px;">
+      <div class="row">
+        <a class="btn-accent" href="/employees">Lab 08</a>
+        <a class="btn" href="/products.html">Products</a>
+        <a class="btn" href="/orders.html">Orders</a>
+        <a class="btn" href="/account.html">Account</a>
+      </div>
+    </div>
 
-  <form id="add-form">
-    <input id="title" placeholder="Tiêu đề" required />
-    <input id="author" placeholder="Tác giả" required />
-    <button type="submit">Thêm sách</button>
-  </form>
+    <form id="add-form" class="panel">
+      <div class="row">
+        <input id="title" placeholder="Tiêu đề" required />
+        <input id="author" placeholder="Tác giả" required />
+        <button type="submit" class="btn-accent">Thêm sách</button>
+      </div>
+    </form>
 
-  <div class="list">
-    <table>
+    <div class="panel">
+      <table>
       <thead>
         <tr>
           <th>ID</th>
@@ -37,7 +95,8 @@
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
-    </table>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -63,7 +122,7 @@
           <td>${b.title}</td>
           <td>${b.author}</td>
           <td>
-            <button data-id="${b.id}" class="del">Xóa</button>
+            <button data-id="${b.id}" class="del btn-danger">Xóa</button>
           </td>
         `;
         tbody.appendChild(tr);

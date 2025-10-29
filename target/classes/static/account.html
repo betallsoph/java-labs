@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account · Neo</title>
+  <style>
+    :root{--bg:#f6f7f9;--ink:#111827;--primary:#93c5fd;--primary-ink:#0f172a;--accent:#ffd803;--danger:#ff6b6b;--card:#fff;--shadow:6px 6px 0 #111827;--radius:10px;--border:3px solid #111827}
+    *{box-sizing:border-box}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:40px;color:var(--ink);background:var(--bg);background-image:linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(0deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:24px 24px}
+    .wrap{max-width:900px;margin:0 auto}
+    .title{display:inline-block;padding:10px 16px;background:var(--accent);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 20px 0}
+    .panel{background:var(--card);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:20px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input{padding:12px 14px;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);outline:none;background:#fff;min-width:240px;width:100%}
+    button,.btn{padding:12px 16px;border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);cursor:pointer;background:var(--primary);color:var(--primary-ink);text-decoration:none;display:inline-block;margin:4px 6px 6px 0}
+    .btn-accent{background:var(--accent);color:#111827}
+    .muted{color:#6b7280}
+    button:active,.btn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #111827}
+    .msg{margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Account</h1>
+    <p class="muted">Lab 09–10 UI · <a class="btn" href="/">Trang chủ</a> · <a class="btn" href="/products.html">Products</a> · <a class="btn" href="/orders.html">Orders</a></p>
+
+    <div class="panel">
+      <h3>Đăng ký</h3>
+      <div class="row">
+        <input id="r-user" placeholder="Username" />
+        <input id="r-pass" placeholder="Password" type="password" />
+        <button id="btn-register" class="btn-accent">Register</button>
+      </div>
+      <div id="r-msg" class="msg"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Đăng nhập</h3>
+      <div class="row">
+        <input id="l-user" placeholder="Username" />
+        <input id="l-pass" placeholder="Password" type="password" />
+        <button id="btn-login" class="btn-accent">Login</button>
+      </div>
+      <div id="l-msg" class="msg"></div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchJSON(url, options){
+      const res = await fetch(url, {headers:{'Content-Type':'application/json'}, ...options});
+      const text = await res.text();
+      let data = null; try { data = text ? JSON.parse(text) : null; } catch(err) {}
+      if(!res.ok) throw new Error(data?.message || text || res.statusText);
+      return data;
+    }
+    document.getElementById('btn-register').onclick = async ()=>{
+      const u = document.getElementById('r-user').value.trim();
+      const p = document.getElementById('r-pass').value.trim();
+      const msg = document.getElementById('r-msg');
+      msg.textContent='';
+      try{ await fetchJSON('/api/account/register',{method:'POST', body: JSON.stringify({username:u,password:p})}); msg.textContent='Đăng ký thành công'; }
+      catch(e){ msg.textContent='Lỗi: ' + e.message; }
+    };
+    document.getElementById('btn-login').onclick = async ()=>{
+      const u = document.getElementById('l-user').value.trim();
+      const p = document.getElementById('l-pass').value.trim();
+      const msg = document.getElementById('l-msg');
+      msg.textContent='';
+      try{ await fetchJSON('/api/account/login',{method:'POST', body: JSON.stringify({username:u,password:p})}); msg.textContent='Đăng nhập OK'; }
+      catch(e){ msg.textContent='Lỗi: ' + e.message; }
+    };
+  </script>
+</body>
+</html>
+
+

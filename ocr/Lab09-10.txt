@@ -1,0 +1,7 @@
+JAVA TECHNOLOGY
+(503111)
+Learn the concept of Cross-Origin Resource Sharing (CORS).
+‘This web service exposes two endpoints /products and /orders that support various HTTP
+product/order. There are also /account/register and /account/login endpoints to manage
+© http://localhost/api/account/register:
+(© http://localhost/api/account/login:

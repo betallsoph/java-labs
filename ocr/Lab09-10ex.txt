@@ -1,0 +1,5 @@
+¢ http://localhost/api/products:
+(© http://localhost/api/products/{id)
+¢ http://localhost/api/orders:
+© http://localhost/api/orders/ {id}:
+invalid endpoint error, method (http method) ) unsupported.

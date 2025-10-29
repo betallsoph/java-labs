@@ -1,0 +1,10 @@
+7 jebidricag nay
+¢ /contact: This path accepts both GET and POST requests. When the request is sent using GET
+Tern ere cna oh ete tr enrages lo
+Clic inl ft: en fh nr ore a a iin
+{contact by POST method. The server then displays the information just received (using a html
+jin
+'¢ /about: This path only accepts GET requests. When accessing this url, the web server returns
+Teast mg lien hi dct hr ngs bea mplie
+If the user sends a request using an unsupported http method (e.g. sending a POST to /about) or
+ai eb i Ane gn ge
