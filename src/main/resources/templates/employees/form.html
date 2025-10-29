@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise 2 - Employee Form</title>
+  <link rel="stylesheet" href="/css/neo.css" />
+</head>
+<body class="nb-page">
+<header class="nb-header">
+  <h1 th:text="${mode == 'add'} ? 'Thêm nhân viên' : 'Sửa nhân viên'"></h1>
+</header>
+<main class="nb-card">
+  <form class="nb-form" th:action="${mode == 'add'} ? '/employees/add' : ('/employees/edit/' + ${employee.id})" method="post" th:object="${employee}">
+    <label>
+      Họ tên
+      <input th:field="*{name}" required />
+    </label>
+    <label>
+      Email
+      <input th:field="*{email}" type="email" required />
+    </label>
+    <label>
+      Chức danh
+      <input th:field="*{position}" required />
+    </label>
+    <label>
+      Lương
+      <input th:field="*{salary}" type="number" step="0.01" min="0" required />
+    </label>
+    <div class="nb-row">
+      <button class="nb-button" type="submit">Lưu</button>
+      <a class="nb-button" href="/employees">Huỷ</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

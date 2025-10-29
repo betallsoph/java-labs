@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise 1 - Contact Result</title>
+  <link rel="stylesheet" href="/css/neo.css" />
+</head>
+<body class="nb-page">
+  <header class="nb-header">
+    <h1>Kết quả liên hệ</h1>
+  </header>
+
+  <main class="nb-card">
+    <p><strong>Họ tên:</strong> <span th:text="${form.name}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${form.email}"></span></p>
+    <p><strong>Nội dung:</strong></p>
+    <pre class="nb-pre" th:text="${form.message}"></pre>
+    <p><a class="nb-button" href="/contact">Gửi lại</a></p>
+  </main>
+</body>
+</html>

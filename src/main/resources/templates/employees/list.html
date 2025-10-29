@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise 2 - Employees</title>
+  <link rel="stylesheet" href="/css/neo.css" />
+</head>
+<body class="nb-page">
+<header class="nb-header">
+  <h1>Nhân viên</h1>
+  <p class="muted">Danh sách nhân viên</p>
+</header>
+<main class="nb-card">
+  <p><a class="nb-button" href="/employees/add">Thêm nhân viên</a></p>
+  <table class="nb-table">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Họ tên</th>
+      <th>Email</th>
+      <th>Chức danh</th>
+      <th>Lương</th>
+      <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="e : ${employees}">
+      <td th:text="${e.id}"></td>
+      <td th:text="${e.name}"></td>
+      <td th:text="${e.email}"></td>
+      <td th:text="${e.position}"></td>
+      <td th:text="${e.salary}"></td>
+      <td>
+        <a class="nb-button" th:href="@{'/employees/edit/' + ${e.id}}">Sửa</a>
+        <form th:action="@{'/employees/delete/' + ${e.id}}" method="post" style="display:inline">
+          <button class="nb-button nb-danger" type="submit">Xoá</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

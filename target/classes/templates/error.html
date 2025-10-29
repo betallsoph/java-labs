@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error</title>
+  <link rel="stylesheet" href="/css/neo.css" />
+</head>
+<body class="nb-page">
+  <header class="nb-header error">
+    <h1>Lỗi <span th:text="${status}"></span></h1>
+    <p class="muted" th:text="${error}"></p>
+  </header>
+  <main class="nb-card">
+    <p th:text="${message}">Thông báo lỗi</p>
+    <p><a class="nb-button" href="/">Về trang chủ</a></p>
+  </main>
+</body>
+</html>

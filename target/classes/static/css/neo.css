@@ -1,0 +1,28 @@
+/*
+ Neo‑Brutalism mini CSS
+ Strong borders, flat colors, large shadows
+*/
+:root {
+  --fg: #111827; /* slate-900 */
+  --bg: #f9fafb; /* gray-50 */
+  --primary: #3b82f6; /* blue-500 */
+  --accent: #22c55e; /* green-500 */
+  --muted: #6b7280; /* gray-500 */
+  --danger: #ef4444; /* red-500 */
+}
+* { box-sizing: border-box; }
+body.nb-page { margin: 32px; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+.nb-header { margin-bottom: 24px; padding: 20px 24px; border: 3px solid #000; background: #fff; box-shadow: 6px 6px 0 #000; }
+.nb-header.error { background: #fee2e2; }
+.nb-card { padding: 20px 24px; border: 3px solid #000; background: #fff; box-shadow: 6px 6px 0 #000; }
+.nb-button { display: inline-block; background: var(--primary); color: #fff; padding: 10px 14px; border: 3px solid #000; text-decoration: none; box-shadow: 4px 4px 0 #000; }
+.nb-button:hover { transform: translate(-1px, -1px); }
+.nb-form label { display: block; margin: 12px 0; }
+.nb-form input, .nb-form textarea, .nb-form select { width: 100%; padding: 10px; border: 3px solid #000; }
+.nb-table { width: 100%; border-collapse: collapse; }
+.nb-table th, .nb-table td { border: 3px solid #000; padding: 8px 10px; text-align: left; }
+.muted { color: var(--muted); }
+.nb-pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border: 3px dashed #000; }
+.nb-row { display: flex; gap: 12px; }
+.nb-row > * { flex: 1; }
+.nb-danger { background: var(--danger); }
