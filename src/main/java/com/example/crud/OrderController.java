@@ -46,6 +46,9 @@ public class OrderController {
     @Operation(summary = "Create order")
     public ResponseEntity<Order> create(@Valid @RequestBody Order order) {
         order.setId(null);
+        if (order.getItems() == null) order.setItems(List.of());
+        order.setTotalPrice(order.getItems().stream().mapToDouble(i -> i.getPrice() * i.getQuantity()).sum());
+        order.setOrderNumber("ORD-" + System.currentTimeMillis());
         Order saved = orderRepository.save(order);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
@@ -57,6 +60,8 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
         order.setId(id);
+        if (order.getItems() == null) order.setItems(List.of());
+        order.setTotalPrice(order.getItems().stream().mapToDouble(i -> i.getPrice() * i.getQuantity()).sum());
         return ResponseEntity.ok(orderRepository.save(order));
     }
 

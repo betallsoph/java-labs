@@ -6,6 +6,7 @@
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/Employee.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/EmployeeRepository.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/EmployeesController.java
+/Users/antt/Desktop/java-labs/src/main/java/com/example/crud/GlobalExceptionHandler.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/HomeController.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/Order.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/OrderController.java
@@ -16,3 +17,6 @@
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/SimpleCrudWarApplication.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/User.java
 /Users/antt/Desktop/java-labs/src/main/java/com/example/crud/UserRepository.java
+/Users/antt/Desktop/java-labs/src/main/java/com/example/crud/security/JwtAuthFilter.java
+/Users/antt/Desktop/java-labs/src/main/java/com/example/crud/security/JwtUtil.java
+/Users/antt/Desktop/java-labs/src/main/java/com/example/crud/security/SecurityConfig.java

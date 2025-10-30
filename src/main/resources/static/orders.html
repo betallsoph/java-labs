@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Orders · Neo</title>
+  <script>(function(){try{if(!localStorage.getItem('token')) location.replace('/');}catch(e){}})();</script>
   <style>
     :root{--bg:#f6f7f9;--ink:#111827;--primary:#93c5fd;--primary-ink:#0f172a;--accent:#ffd803;--danger:#ff6b6b;--card:#fff;--shadow:6px 6px 0 #111827;--radius:10px;--border:3px solid #111827}
     *{box-sizing:border-box}
@@ -28,74 +29,86 @@
 <body>
   <div class="wrap">
     <h1 class="title">Orders</h1>
-    <p class="muted">Lab 09–10 UI · <a class="btn" href="/">Trang chủ</a> · <a class="btn" href="/products.html">Products</a> · <a class="btn" href="/account.html">Account</a></p>
+    <p class="muted">Lab 09–10 UI · <a class="btn" href="/home">Trang chủ</a> · <a class="btn" href="/products.html">Products</a> · <button class="btn btn-danger" onclick="logout()">Logout</button></p>
     <div class="panel">
       <div class="row">
-        <input id="productId" placeholder="Product ID" />
-        <input id="quantity" placeholder="Số lượng" type="number" step="1" />
-        <button id="add" class="btn-accent">Thêm</button>
+        <button id="addRow" class="btn-accent">Thêm dòng</button>
+        <button id="create" class="btn-accent">Tạo đơn</button>
+        <button id="viewOrders" class="btn">Xem danh sách đơn</button>
       </div>
     </div>
     <div class="panel">
       <table>
         <thead>
-          <tr><th>ID</th><th>ProductId</th><th>Quantity</th><th>Hành động</th></tr>
+          <tr><th>ProductId</th><th>Quantity</th><th>Unit Price</th><th>Hành động</th></tr>
         </thead>
         <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="panel"><b>Tổng tạm tính: </b><span id="sum">0</span></div>
+    <div class="panel" id="ordersPanel" style="display:none;">
+      <table>
+        <thead>
+          <tr><th>Order #</th><th>Total</th><th>Số items</th></tr>
+        </thead>
+        <tbody id="ordersBody"></tbody>
       </table>
     </div>
   </div>
 
   <script>
     const API = '/api/orders';
+    function authHeaders(){ const t=localStorage.getItem('token'); return t?{'Authorization':'Bearer '+t}:{ }; }
     async function fetchJSON(url, options){
-      const res = await fetch(url, {headers:{'Content-Type':'application/json'}, ...options});
+      const res = await fetch(url, {headers:{'Content-Type':'application/json', ...authHeaders()}, ...options});
       if(!res.ok) throw new Error(await res.text());
       return res.status !== 204 ? res.json() : null;
     }
-    async function load(){
-      const data = await fetchJSON(API);
-      const tbody = document.getElementById('tbody');
-      tbody.innerHTML = '';
-      data.forEach(o => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${o.id}</td>
-          <td><input data-id="${o.id}" class="pid" value="${o.productId||''}" /></td>
-          <td><input data-id="${o.id}" class="qty" type="number" step="1" value="${o.quantity||0}" /></td>
-          <td>
-            <button class="save" data-id="${o.id}">Lưu</button>
-            <button class="del btn-danger" data-id="${o.id}">Xoá</button>
-          </td>`;
-        tbody.appendChild(tr);
+    function addRow(){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><input class="pid" placeholder="productId"/></td>
+        <td><input class="qty" type="number" step="1" value="1"/></td>
+        <td><input class="price" type="number" step="0.01" value="0"/></td>
+        <td><button class="remove btn-danger">Xoá</button></td>`;
+      document.getElementById('tbody').appendChild(tr);
+      updateSum();
+    }
+    function updateSum(){
+      let sum=0; document.querySelectorAll('#tbody tr').forEach(tr=>{
+        const q=parseInt(tr.querySelector('.qty').value||'0',10);
+        const p=parseFloat(tr.querySelector('.price').value||'0'); sum+=q*p;
+      }); document.getElementById('sum').textContent=sum.toFixed(2);
+    }
+    async function createOrder(){
+      const items=[]; document.querySelectorAll('#tbody tr').forEach(tr=>{
+        const pid=tr.querySelector('.pid').value.trim();
+        const qty=parseInt(tr.querySelector('.qty').value||'0',10);
+        const price=parseFloat(tr.querySelector('.price').value||'0');
+        if(pid && qty>0) items.push({productId:pid, quantity:qty, price});
       });
+      if(items.length===0) return;
+      await fetchJSON(API,{method:'POST', body: JSON.stringify({items})});
+      document.getElementById('tbody').innerHTML=''; updateSum();
+      alert('Đã tạo đơn');
     }
-    async function add(){
-      const productId = document.getElementById('productId').value.trim();
-      const quantity = parseInt(document.getElementById('quantity').value||'0',10);
-      if(!productId) return;
-      await fetchJSON(API,{method:'POST', body: JSON.stringify({productId, quantity})});
-      document.getElementById('productId').value='';
-      document.getElementById('quantity').value='';
-      load();
+    async function loadOrders(){
+      const list = await fetchJSON(API);
+      const tb = document.getElementById('ordersBody'); tb.innerHTML='';
+      list.forEach(o=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${o.orderNumber||o.id}</td><td>${(o.totalPrice||0).toFixed(2)}</td><td>${(o.items||[]).length}</td>`;
+        tb.appendChild(tr);
+      });
+      document.getElementById('ordersPanel').style.display='block';
     }
-    async function save(id){
-      const pid = document.querySelector(`input.pid[data-id="${id}"]`).value.trim();
-      const qty = parseInt(document.querySelector(`input.qty[data-id="${id}"]`).value||'0',10);
-      await fetchJSON(`${API}/${id}`,{method:'PUT', body: JSON.stringify({productId:pid, quantity:qty})});
-      load();
-    }
-    async function del(id){
-      await fetchJSON(`${API}/${id}`,{method:'DELETE'});
-      load();
-    }
-    document.getElementById('add').addEventListener('click', add);
+    document.getElementById('addRow').addEventListener('click', addRow);
+    document.getElementById('create').addEventListener('click', createOrder);
+    document.getElementById('viewOrders').addEventListener('click', loadOrders);
+    document.getElementById('tbody').addEventListener('input', updateSum);
     document.getElementById('tbody').addEventListener('click', (e)=>{
-      const t=e.target; const id=t.dataset.id;
-      if(t.classList.contains('save')) save(id);
-      if(t.classList.contains('del')) del(id);
+      if(e.target.classList.contains('remove')) e.target.closest('tr').remove(), updateSum();
     });
-    load().catch(console.error);
+    function logout(){ localStorage.removeItem('token'); location.replace('/'); }
   </script>
 </body>
 </html>

@@ -8,6 +8,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
+        return "forward:/login.html";
+    }
+
+    @GetMapping("/home")
+    public String appHome() {
         return "forward:/index.html";
     }
 

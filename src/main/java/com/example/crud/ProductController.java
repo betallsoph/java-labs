@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,6 +69,21 @@ public class ProductController {
         }
         productRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "Patch (partial update) product")
+    public ResponseEntity<Product> patch(@PathVariable String id, @RequestBody Product patch) {
+        return productRepository.findById(id)
+            .map(existing -> {
+                if (patch.getCode() != null && !patch.getCode().isBlank()) existing.setCode(patch.getCode());
+                if (patch.getName() != null && !patch.getName().isBlank()) existing.setName(patch.getName());
+                if (patch.getImageUrl() != null) existing.setImageUrl(patch.getImageUrl());
+                if (patch.getDescription() != null) existing.setDescription(patch.getDescription());
+                if (patch.getPrice() != 0) existing.setPrice(patch.getPrice());
+                return ResponseEntity.ok(productRepository.save(existing));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }
 

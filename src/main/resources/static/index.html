@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Demo CRUD Sách</title>
+  <script>
+    (function(){
+      try{ if(!localStorage.getItem('token')) location.replace('/'); }catch(e){}
+    })();
+  </script>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -66,13 +71,12 @@
 <body>
   <div class="wrap">
     <h1 class="title">Demo CRUD Sách</h1>
-    <p class="muted">API: <code>/api/books</code> — DB: MongoDB local — <a href="/contact">Liên hệ</a></p>
+    <p class="muted">API: <code>/api/books</code> — DB: MongoDB local — <a href="/contact">Liên hệ</a> · <button class="btn btn-danger" onclick="logout()">Logout</button></p>
     <div class="panel" style="margin-top:16px;">
       <div class="row">
-        <a class="btn-accent" href="/employees">Lab 08</a>
         <a class="btn" href="/products.html">Products</a>
         <a class="btn" href="/orders.html">Orders</a>
-        <a class="btn" href="/account.html">Account</a>
+        <a class="btn" href="/employees">Lab 08</a>
       </div>
     </div>
 
@@ -102,9 +106,14 @@
   <script>
     const API = '/api/books';
 
+    function authHeaders() {
+      const t = localStorage.getItem('token');
+      return t ? { 'Authorization': 'Bearer ' + t } : {};
+    }
+
     async function fetchJSON(url, options) {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         ...options,
       });
       if (!res.ok) throw new Error(await res.text());
@@ -151,6 +160,7 @@
       if (btn) deleteBook(btn.dataset.id);
     });
 
+    function logout(){ localStorage.removeItem('token'); location.replace('/'); }
     loadBooks().catch(err => console.error(err));
   </script>
 </body>

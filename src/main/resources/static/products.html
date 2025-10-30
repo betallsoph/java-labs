@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Products · Neo</title>
+  <script>(function(){try{if(!localStorage.getItem('token')) location.replace('/');}catch(e){}})();</script>
   <style>
     :root{--bg:#f6f7f9;--ink:#111827;--primary:#93c5fd;--primary-ink:#0f172a;--accent:#ffd803;--danger:#ff6b6b;--card:#fff;--shadow:6px 6px 0 #111827;--radius:10px;--border:3px solid #111827}
     *{box-sizing:border-box}
@@ -28,18 +29,33 @@
 <body>
   <div class="wrap">
     <h1 class="title">Products</h1>
-    <p class="muted">Lab 09–10 UI · <a class="btn" href="/">Trang chủ</a> · <a class="btn" href="/orders.html">Orders</a> · <a class="btn" href="/account.html">Account</a></p>
+    <p class="muted">Lab 09–10 UI · <a class="btn" href="/home">Trang chủ</a> · <a class="btn" href="/orders.html">Orders</a> · <button class="btn btn-danger" onclick="logout()">Logout</button></p>
     <div class="panel">
       <div class="row">
+        <input id="code" placeholder="Mã SP" />
         <input id="name" placeholder="Tên sản phẩm" />
         <input id="price" placeholder="Giá" type="number" step="0.01" />
+        <input id="imageUrl" placeholder="Ảnh (URL)" />
+        <input id="description" placeholder="Mô tả" />
         <button id="add" class="btn-accent">Thêm</button>
+      </div>
+    </div>
+    <div class="panel" id="editPanel" style="display:none;">
+      <div class="row">
+        <input id="e_id" placeholder="ID" readonly />
+        <input id="e_code" placeholder="Mã SP" />
+        <input id="e_name" placeholder="Tên sản phẩm" />
+        <input id="e_price" placeholder="Giá" type="number" step="0.01" />
+        <input id="e_imageUrl" placeholder="Ảnh (URL)" />
+        <input id="e_description" placeholder="Mô tả" />
+        <button id="save" class="btn-accent">Lưu</button>
+        <button id="cancel" class="btn">Huỷ</button>
       </div>
     </div>
     <div class="panel">
       <table>
         <thead>
-          <tr><th>ID</th><th>Tên</th><th>Giá</th><th>Hành động</th></tr>
+          <tr><th>ID</th><th>Mã</th><th>Tên</th><th>Giá</th><th>Ảnh</th><th>Mô tả</th><th>Hành động</th></tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -48,8 +64,9 @@
 
   <script>
     const API = '/api/products';
+    function authHeaders(){ const t=localStorage.getItem('token'); return t?{'Authorization':'Bearer '+t}:{ }; }
     async function fetchJSON(url, options){
-      const res = await fetch(url, {headers:{'Content-Type':'application/json'}, ...options});
+      const res = await fetch(url, {headers:{'Content-Type':'application/json', ...authHeaders()}, ...options});
       if(!res.ok) throw new Error(await res.text());
       return res.status !== 204 ? res.json() : null;
     }
@@ -61,28 +78,53 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${p.id}</td>
-          <td><input data-id="${p.id}" class="nm" value="${p.name||''}" /></td>
-          <td><input data-id="${p.id}" class="pr" type="number" step="0.01" value="${p.price||0}" /></td>
+          <td>${p.code||''}</td>
+          <td>${p.name||''}</td>
+          <td>${p.price||0}</td>
+          <td>${p.imageUrl||''}</td>
+          <td>${p.description||''}</td>
           <td>
-            <button class="save" data-id="${p.id}">Lưu</button>
+            <button class="edit" data-id="${p.id}">Sửa</button>
             <button class="del btn-danger" data-id="${p.id}">Xoá</button>
           </td>`;
         tbody.appendChild(tr);
       });
     }
     async function add(){
+      const code = document.getElementById('code').value.trim();
       const name = document.getElementById('name').value.trim();
       const price = parseFloat(document.getElementById('price').value||'0');
-      if(!name) return;
-      await fetchJSON(API,{method:'POST', body: JSON.stringify({name, price})});
+      const imageUrl = document.getElementById('imageUrl').value.trim();
+      const description = document.getElementById('description').value.trim();
+      if(!code||!name) return;
+      await fetchJSON(API,{method:'POST', body: JSON.stringify({code, name, price, imageUrl, description})});
       document.getElementById('name').value='';
       document.getElementById('price').value='';
+      document.getElementById('code').value='';
+      document.getElementById('imageUrl').value='';
+      document.getElementById('description').value='';
       load();
     }
-    async function save(id){
-      const nm = document.querySelector(`input.nm[data-id="${id}"]`).value.trim();
-      const pr = parseFloat(document.querySelector(`input.pr[data-id="${id}"]`).value||'0');
-      await fetchJSON(`${API}/${id}`,{method:'PUT', body: JSON.stringify({name:nm, price:pr})});
+    function openEdit(p){
+      document.getElementById('editPanel').style.display='block';
+      document.getElementById('e_id').value=p.id;
+      document.getElementById('e_code').value=p.code||'';
+      document.getElementById('e_name').value=p.name||'';
+      document.getElementById('e_price').value=p.price||0;
+      document.getElementById('e_imageUrl').value=p.imageUrl||'';
+      document.getElementById('e_description').value=p.description||'';
+    }
+    async function saveEdit(){
+      const id=document.getElementById('e_id').value;
+      const body={
+        code:document.getElementById('e_code').value.trim(),
+        name:document.getElementById('e_name').value.trim(),
+        price:parseFloat(document.getElementById('e_price').value||'0'),
+        imageUrl:document.getElementById('e_imageUrl').value.trim(),
+        description:document.getElementById('e_description').value.trim()
+      };
+      await fetchJSON(`${API}/${id}`,{method:'PUT', body: JSON.stringify(body)});
+      document.getElementById('editPanel').style.display='none';
       load();
     }
     async function del(id){
@@ -90,11 +132,17 @@
       load();
     }
     document.getElementById('add').addEventListener('click', add);
-    document.getElementById('tbody').addEventListener('click', (e)=>{
+    document.getElementById('tbody').addEventListener('click', async (e)=>{
       const t=e.target; const id=t.dataset.id;
-      if(t.classList.contains('save')) save(id);
+      if(t.classList.contains('edit')){
+        const p = await fetchJSON(`${API}/${id}`);
+        openEdit(p);
+      }
       if(t.classList.contains('del')) del(id);
     });
+    document.getElementById('save').addEventListener('click', saveEdit);
+    document.getElementById('cancel').addEventListener('click', ()=>{ document.getElementById('editPanel').style.display='none'; });
+    function logout(){ localStorage.removeItem('token'); location.replace('/'); }
     load().catch(console.error);
   </script>
 </body>

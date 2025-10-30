@@ -42,10 +42,10 @@ public class EmployeesController {
                 + ".btn-accent{background:var(--accent);color:#111827} .btn-danger{background:var(--danger)}"
                 + "table{width:100%;border-collapse:separate;border-spacing:0}thead th{background:#e5e7eb;text-align:left;padding:12px;border-top:var(--border);border-bottom:var(--border);border-left:var(--border)}thead th:last-child{border-right:var(--border)}tbody td{padding:12px;border-left:var(--border);border-bottom:var(--border);background:#fff}tbody tr td:last-child{border-right:var(--border)}"
                 + ".actions form{display:inline} .muted{color:#6b7280} .space{height:8px}"
-                + "</style></head><body>");
+                + "</style><script>(function(){try{if(!localStorage.getItem('token')) location.replace('/');}catch(e){}})();</script></head><body>");
         html.append("<div class='wrap'>");
         html.append("<h1 class='title'>Danh sách nhân viên</h1>");
-        html.append("<p class='muted'>Trang MVC theo yêu cầu Lab 08 (Exercise 2) · <a class='btn btn-accent' href='/'>Trang chủ</a></p>");
+        html.append("<p class='muted'>Trang MVC theo yêu cầu Lab 08 (Exercise 2) · <a class='btn btn-accent' href='/home'>Trang chủ</a> · <button class='btn btn-danger' onclick=\"localStorage.removeItem('token');location.replace('/');\">Logout</button></p>");
         html.append("<div class='panel'><div class='row'><a class='btn btn-accent' href='/employees/add'>Thêm nhân viên</a></div></div>");
         html.append("<div class='panel'><table><thead><tr><th>ID</th><th>Tên</th><th>Email</th><th>Vị trí</th><th>Hành động</th></tr></thead><tbody>");
         for (Employee e : all) {
@@ -61,7 +61,7 @@ public class EmployeesController {
                 .append("</td>")
                 .append("</tr>");
         }
-        html.append("</tbody></table></div></div></body></html>");
+        html.append("</tbody></table></div></div><script>function logout(){localStorage.removeItem('token');location.replace('/');}</script></body></html>");
         return ResponseEntity.ok(html.toString());
     }
 
@@ -80,7 +80,7 @@ public class EmployeesController {
                 "<div class='row'><input name='email' placeholder='Email' required></div>" +
                 "<div class='row'><input name='position' placeholder='Vị trí' required></div>" +
                 "<div class='row'><button class='btn-accent' type='submit'>Lưu</button><a class='btn' style='margin-left:10px' href='/employees'>Huỷ</a></div>" +
-                "</form></div></div></body></html>";
+                "</form></div></div><script>function logout(){localStorage.removeItem('token');location.replace('/');}</script></body></html>";
         return ResponseEntity.ok(html);
     }
 
@@ -108,7 +108,7 @@ public class EmployeesController {
                             "<div class='row'><input name='email' value='" + e.getEmail() + "' placeholder='Email' required></div>" +
                             "<div class='row'><input name='position' value='" + e.getPosition() + "' placeholder='Vị trí' required></div>" +
                             "<div class='row'><button class='btn-accent' type='submit'>Cập nhật</button><a class='btn' style='margin-left:10px' href='/employees'>Huỷ</a></div>" +
-                            "</form></div></div></body></html>";
+                            "</form></div></div><script>function logout(){localStorage.removeItem('token');location.replace('/');}</script></body></html>";
                     return ResponseEntity.ok(html);
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found"));

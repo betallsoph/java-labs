@@ -5,10 +5,13 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.crud.security.JwtUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,25 +22,31 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AccountController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AccountController(UserRepository userRepository) {
+    public AccountController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
     @Operation(summary = "Register account")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
-        String username = Optional.ofNullable(body.get("username")).orElse("").trim();
+        String email = Optional.ofNullable(body.get("email")).orElse("").trim();
         String password = Optional.ofNullable(body.get("password")).orElse("").trim();
-        if (username.isEmpty() || password.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username/password required");
+        String firstName = Optional.ofNullable(body.get("firstName")).orElse("").trim();
+        String lastName = Optional.ofNullable(body.get("lastName")).orElse("").trim();
+        if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "email/password/firstName/lastName required"));
         }
-        if (userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("username exists");
+        if (userRepository.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "email exists"));
         }
         User u = new User();
-        u.setUsername(username);
-        u.setPassword(password); // demo only
+        u.setEmail(email);
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setPassword(passwordEncoder.encode(password));
         userRepository.save(u);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -45,12 +54,15 @@ public class AccountController {
     @PostMapping("/login")
     @Operation(summary = "Login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = Optional.ofNullable(body.get("username")).orElse("").trim();
+        String email = Optional.ofNullable(body.get("email")).orElse("").trim();
         String password = Optional.ofNullable(body.get("password")).orElse("").trim();
-        return userRepository.findByUsername(username)
-                .filter(u -> u.getPassword().equals(password))
-                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(Map.of("message", "ok")))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("invalid credentials"));
+        return userRepository.findByEmail(email)
+                .filter(u -> passwordEncoder.matches(password, u.getPassword()))
+                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(Map.of(
+                        "message", "ok",
+                        "token", JwtUtil.generateToken(email)
+                )))
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid credentials")));
     }
 }
 

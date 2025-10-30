@@ -23,7 +23,7 @@
 <body>
   <div class="wrap">
     <h1 class="title">Account</h1>
-    <p class="muted">Lab 09–10 UI · <a class="btn" href="/">Trang chủ</a> · <a class="btn" href="/products.html">Products</a> · <a class="btn" href="/orders.html">Orders</a></p>
+    <p class="muted">Lab 09–10 UI · <a class="btn" href="/">Trang chủ</a></p>
 
     <div class="panel">
       <h3>Đăng ký</h3>
@@ -67,7 +67,7 @@
       const p = document.getElementById('l-pass').value.trim();
       const msg = document.getElementById('l-msg');
       msg.textContent='';
-      try{ await fetchJSON('/api/account/login',{method:'POST', body: JSON.stringify({username:u,password:p})}); msg.textContent='Đăng nhập OK'; }
+      try{ const data = await fetchJSON('/api/account/login',{method:'POST', body: JSON.stringify({username:u,password:p})}); localStorage.setItem('token', data.token); msg.textContent='Đăng nhập OK'; setTimeout(()=>{ location.href='/home'; }, 500); }
       catch(e){ msg.textContent='Lỗi: ' + e.message; }
     };
   </script>
